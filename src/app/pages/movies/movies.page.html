@@ -1,28 +1,49 @@
 <ion-header>
   <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
     <ion-title>Trending Movie</ion-title>
+    <ion-buttons slot="end">
+      <ion-select placeholder="Select Genre" [(ngModel)]="selectedGenreId" (ionChange)="filterByGenre()">
+        <ion-select-option value="">All Genres</ion-select-option>
+        <ion-select-option *ngFor="let genre of genres" [value]="genre.id">{{ genre.name }}</ion-select-option>
+      </ion-select>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar [(ngModel)]="searchQuery" placeholder="Search movies" (ionInput)="searchMovies()"></ion-searchbar>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-list>
+  <ion-list *ngIf="!searchQuery">
     <ion-item button *ngFor="let item of movies" [routerLink]="[item.id]">
-      <ion-avatar slot="start" > 
-        <img [src]="imageBaseUrl + '/w92/' + item.poster_path"/>
+      <ion-avatar slot="start">
+        <img [src]="imageBaseUrl + '/w92/' + item.poster_path" />
       </ion-avatar>
-<ion-label>
-  {{ item.title  }}
-  <p>{{ item.release_date | date:'y'}}</p>
-</ion-label>
-<ion-badge slot="end">
-   {{ item.vote_average }}
-</ion-badge>
+      <ion-label>
+        {{ item.title }}
+        <p>{{ item.release_date | date: 'y' }}</p>
+      </ion-label>
+      <ion-badge slot="end">{{ item.vote_average }}</ion-badge>
     </ion-item>
   </ion-list>
 
-<ion-infinite-scroll (ionInfinite)="loadMore($any($event))">
-<ion-infinite-scroll-content loadingSpinner="circles" loadingText="Loading more data...."></ion-infinite-scroll-content>
-</ion-infinite-scroll>
+  <ion-list *ngIf="searchQuery">
+    <ion-item button *ngFor="let item of searchResults" [routerLink]="[item.id]">
+      <ion-avatar slot="start">
+        <img [src]="imageBaseUrl + '/w92/' + item.poster_path" />
+      </ion-avatar>
+      <ion-label>
+        {{ item.title }}
+        <p>{{ item.release_date | date: 'y' }}</p>
+      </ion-label>
+      <ion-badge slot="end">{{ item.vote_average }}</ion-badge>
+    </ion-item>
+  </ion-list>
 
-
+  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMore($event)">
+    <ion-infinite-scroll-content loadingSpinner="circles" loadingText="Loading more data...."></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 </ion-content>
